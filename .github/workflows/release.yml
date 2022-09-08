@@ -61,7 +61,6 @@ jobs:
 
       - name: dummy ls
         run: |
-          ls ${{ github.workspace }}/dependencies
           ls ${{ github.workspace }}/dependencies/include
 
 
