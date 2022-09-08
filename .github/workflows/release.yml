@@ -35,21 +35,6 @@ jobs:
   build_wheels:
     name: "🏗 py${{ matrix.py }} on ${{ matrix.os }}"
     runs-on: ${{ matrix.os }}
-    env:
-      CIBW_BUILD: "${{ matrix.py }}-*"
-      CIBW_ARCHS_LINUX: auto
-      CIBW_ARCHS_MACOS: auto universal2
-      CIBW_ARCHS_WINDOWS: auto
-      # musllinux builds, but is unstable, see https://github.com/numpy/numpy/pull/21200
-      CIBW_SKIP: "*-musllinux_*"
-      # Ensure numpy is installed first to get around a bug with setuptools
-      # which causes conflicts when installing eggs.
-      CIBW_BEFORE_BUILD: "pip install numpy"
-      CIBW_BEFORE_TEST: "pip install pytest flake8 pandas"
-      CIBW_TEST_COMMAND: "pytest {project}/tests"
-      # Can't test cross-compiled Mac OS builds.
-      CIBW_TEST_SKIP: "*_arm64 *_universal2:arm64"
-      
 
     strategy:
       fail-fast: false
@@ -62,6 +47,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Setting up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+
       - name: Install ta-lib binary
         run: |
           bash -v ./tools/build_talib_from_source.bash ${{ github.workspace }}/dependencies
@@ -69,8 +59,25 @@ jobs:
           export TA_LIBRARY_PATH=${{ github.workspace }}/dependencies/lib
           export TA_INCLUDE_PATH=${{ github.workspace }}/dependencies/include
 
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.9.0
+
       - name: Building binary wheels
-        uses: pypa/cibuildwheel@v2.4.0
+        run: python -m cibuildwheel --output-dir wheelhouse
+        env:
+          CIBW_BUILD: "${{ matrix.py }}-*"
+          CIBW_ARCHS_LINUX: auto
+          CIBW_ARCHS_MACOS: auto universal2
+          CIBW_ARCHS_WINDOWS: auto
+          # musllinux builds, but is unstable, see https://github.com/numpy/numpy/pull/21200
+          CIBW_SKIP: "*-musllinux_*"
+          # Ensure numpy is installed first to get around a bug with setuptools
+          # which causes conflicts when installing eggs.
+          CIBW_BEFORE_BUILD: "pip install numpy"
+          CIBW_BEFORE_TEST: "pip install pytest flake8 pandas"
+          CIBW_TEST_COMMAND: "pytest {project}/tests"
+          # Can't test cross-compiled Mac OS builds.
+          CIBW_TEST_SKIP: "*_arm64 *_universal2:arm64"
 
       - uses: actions/upload-artifact@v2
         with:
