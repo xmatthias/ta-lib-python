@@ -76,7 +76,8 @@ jobs:
           # which causes conflicts when installing eggs.
           CIBW_BEFORE_BUILD: "pip install numpy"
           CIBW_BEFORE_TEST: "pip install pytest flake8 pandas"
-          CIBW_TEST_COMMAND: "pytest {project}"
+          # CIBW_TEST_COMMAND: "pytest {project}"
+          CIBW_TEST_COMMAND: "python -m talib.abstract"
           CIBW_ENVIRONMENT: LD_LIBRARY_PATH="`pwd`/dependencies/lib:$LD_LIBRARY_PATH" TA_LIBRARY_PATH="`pwd`/dependencies/lib" TA_INCLUDE_PATH="`pwd`/dependencies/include"
           # Can't test cross-compiled Mac OS builds.
           CIBW_TEST_SKIP: "*_arm64 *_universal2:arm64"
@@ -112,3 +113,39 @@ jobs:
   #     - uses: actions/upload-artifact@v2
   #       with:
   #         path: ./wheelhouse/*.whl
+
+
+  test_wheels:
+    needs: [ build_wheels ]
+    name: Test ${{ matrix.python-version }} ${{ matrix.arch }} wheels for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ 'ubuntu-latest']
+        python-version: ['3.7', '3.8', '3.9','3.10']
+        arch: ['x64', 'x86']
+        exclude:
+        - os: 'ubuntu-latest'
+          arch: 'x86'
+        - os: 'macos-latest'
+          arch: 'x86'
+
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          path: ./wheelhouse/
+
+      - name: Install Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.arch }}
+
+      - name: Install tables on ${{ matrix.python-version }}
+        run: |
+          pip install numpy>=1.19.0 numexpr>=2.6.2
+          pip install --no-index --find-links wheelhouse/artifact/ ta-lib
+      - name: Run tests on ${{ matrix.python-version }}
+        run: |
+          python -m talib.abstract
