@@ -62,6 +62,7 @@ jobs:
       - name: dummy ls
         run: |
           ls ${{ github.workspace }}/dependencies/include
+          ls ${{ github.workspace }}/dependencies/include/ta-lib
 
 
       - name: Building binary wheels
