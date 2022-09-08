@@ -55,9 +55,6 @@ jobs:
       - name: Install ta-lib binary
         run: |
           bash -v ./tools/build_talib_from_source.bash ${{ github.workspace }}/dependencies
-          export LD_LIBRARY_PATH=${{ github.workspace }}/dependencies/lib:$LD_LIBRARY_PATH
-          export TA_LIBRARY_PATH=${{ github.workspace }}/dependencies/lib
-          export TA_INCLUDE_PATH=${{ github.workspace }}/dependencies/include
 
       - name: Install cibuildwheel
         run: python -m pip install cibuildwheel==2.9.0
@@ -78,6 +75,9 @@ jobs:
           CIBW_TEST_COMMAND: "pytest {project}/tests"
           # Can't test cross-compiled Mac OS builds.
           CIBW_TEST_SKIP: "*_arm64 *_universal2:arm64"
+          LD_LIBRARY_PATH: "${{ github.workspace }}/dependencies/lib:$LD_LIBRARY_PATH"
+          TA_LIBRARY_PATH: "${{ github.workspace }}/dependencies/lib"
+          TA_INCLUDE_PATH: "${{ github.workspace }}/dependencies/include"
 
       - uses: actions/upload-artifact@v2
         with:
