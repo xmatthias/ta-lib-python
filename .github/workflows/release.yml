@@ -49,6 +49,7 @@ jobs:
       CIBW_TEST_COMMAND: "pytest {project}/tests"
       # Can't test cross-compiled Mac OS builds.
       CIBW_TEST_SKIP: "*_arm64 *_universal2:arm64"
+      
 
     strategy:
       fail-fast: false
@@ -62,7 +63,11 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install ta-lib binary
-        run: bash -v ./tools/build_talib_from_source.bash ${{ github.workspace }}/dependencies
+        run: |
+          bash -v ./tools/build_talib_from_source.bash ${{ github.workspace }}/dependencies
+          export LD_LIBRARY_PATH=${{ github.workspace }}/dependencies/lib:$LD_LIBRARY_PATH
+          export TA_LIBRARY_PATH=${{ github.workspace }}/dependencies/lib
+          export TA_INCLUDE_PATH=${{ github.workspace }}/dependencies/include
 
       - name: Building binary wheels
         uses: pypa/cibuildwheel@v2.4.0
