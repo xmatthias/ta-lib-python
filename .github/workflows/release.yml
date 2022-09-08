@@ -73,11 +73,9 @@ jobs:
           CIBW_BEFORE_BUILD: "pip install numpy && echo $TA_LIBRARY_PATH && echo $LD_LIBRARY_PATH && echo $TA_INCLUDE_PATH"
           CIBW_BEFORE_TEST: "pip install pytest flake8 pandas"
           CIBW_TEST_COMMAND: "pytest {project}/tests"
+          CIBW_ENVIRONMENT: LD_LIBRARY_PATH="${{ github.workspace }}/dependencies/lib:$LD_LIBRARY_PATH" TA_LIBRARY_PATH="${{ github.workspace }}/dependencies/lib" LD_LIBRARY_PATH="${{ github.workspace }}/dependencies/include"
           # Can't test cross-compiled Mac OS builds.
           CIBW_TEST_SKIP: "*_arm64 *_universal2:arm64"
-          LD_LIBRARY_PATH: "${{ github.workspace }}/dependencies/lib:$LD_LIBRARY_PATH"
-          TA_LIBRARY_PATH: "${{ github.workspace }}/dependencies/lib"
-          TA_INCLUDE_PATH: "${{ github.workspace }}/dependencies/include"
 
       - uses: actions/upload-artifact@v2
         with:
