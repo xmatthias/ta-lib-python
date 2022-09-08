@@ -44,7 +44,6 @@ jobs:
       CIBW_SKIP: "*-musllinux_*"
       # Ensure numpy is installed first to get around a bug with setuptools
       # which causes conflicts when installing eggs.
-      CIBW_BEFORE_ALL_LINUX: "bash -v ./tools/build_talib_from_source.bash ${{ github.workspace }}/dependencies"
       CIBW_BEFORE_BUILD: "pip install numpy"
       CIBW_BEFORE_TEST: "pip install pytest flake8 pandas"
       CIBW_TEST_COMMAND: "pytest {project}/tests"
@@ -60,14 +59,17 @@ jobs:
         py: ["cp310"]
 
     steps:
-        - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-        - name: Building binary wheels
-          uses: pypa/cibuildwheel@v2.4.0
+      - name: Install ta-lib binary
+        run: bash -v ./tools/build_talib_from_source.bash ${{ github.workspace }}/dependencies
 
-        - uses: actions/upload-artifact@v2
-          with:
-            path: ./wheelhouse/*.whl
+      - name: Building binary wheels
+        uses: pypa/cibuildwheel@v2.4.0
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./wheelhouse/*.whl
 
   # Build the wheels which require host emulation.
   # ppc64le compilation works, but is unbelievably slow.
