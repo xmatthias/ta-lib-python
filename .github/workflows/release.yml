@@ -76,12 +76,10 @@ jobs:
           # which causes conflicts when installing eggs.
           CIBW_BEFORE_BUILD: "pip install numpy"
           CIBW_BEFORE_TEST: "pip install pytest flake8 pandas"
-          CIBW_TEST_COMMAND: "pytest {project}/tests"
+          CIBW_TEST_COMMAND: "pytest {project}"
           CIBW_ENVIRONMENT: LD_LIBRARY_PATH="`pwd`/dependencies/lib:$LD_LIBRARY_PATH" TA_LIBRARY_PATH="`pwd`/dependencies/lib" TA_INCLUDE_PATH="`pwd`/dependencies/include"
           # Can't test cross-compiled Mac OS builds.
           CIBW_TEST_SKIP: "*_arm64 *_universal2:arm64"
-          CIBW_BEFORE_ALL_LINUX: >
-            ls -l $TA_INCLUDE_PATH/*
 
       - uses: actions/upload-artifact@v2
         with:
