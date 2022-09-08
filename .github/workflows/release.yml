@@ -44,7 +44,7 @@ jobs:
       CIBW_SKIP: "*-musllinux_*"
       # Ensure numpy is installed first to get around a bug with setuptools
       # which causes conflicts when installing eggs.
-      CIBW_BEFORE_ALL_LINUX: bash -v ./tools/build_talib_from_source.bash $DEPS_PATH
+      CIBW_BEFORE_ALL_LINUX: echo "deps_path is ${DEPS_PATH}" && bash -v ./tools/build_talib_from_source.bash $DEPS_PATH
       CIBW_BEFORE_BUILD: "pip install numpy"
       CIBW_BEFORE_TEST: "pip install pytest flake8 pandas"
       CIBW_TEST_COMMAND: "pytest {project}/tests"
