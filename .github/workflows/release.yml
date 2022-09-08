@@ -70,7 +70,7 @@ jobs:
           CIBW_SKIP: "*-musllinux_*"
           # Ensure numpy is installed first to get around a bug with setuptools
           # which causes conflicts when installing eggs.
-          CIBW_BEFORE_BUILD: "pip install numpy && echo $TA_LIBRARY_PATH && echo $LD_LIBRARY_PATH && echo $TA_INCLUDE_PATH && ls $TA_INCLUDE_PATH"
+          CIBW_BEFORE_BUILD: "pip install numpy && echo $TA_LIBRARY_PATH && echo $LD_LIBRARY_PATH && ls $TA_INCLUDE_PATH; echo $TA_INCLUDE_PATH "
           CIBW_BEFORE_TEST: "pip install pytest flake8 pandas"
           CIBW_TEST_COMMAND: "pytest {project}/tests"
           CIBW_ENVIRONMENT: LD_LIBRARY_PATH="${{ github.workspace }}/dependencies/lib:$LD_LIBRARY_PATH" TA_LIBRARY_PATH="${{ github.workspace }}/dependencies/lib" TA_INCLUDE_PATH="${{ github.workspace }}/dependencies/include"
