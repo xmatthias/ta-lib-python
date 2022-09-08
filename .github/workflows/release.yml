@@ -44,16 +44,22 @@ jobs:
       CIBW_SKIP: "*-musllinux_*"
       # Ensure numpy is installed first to get around a bug with setuptools
       # which causes conflicts when installing eggs.
-      CIBW_BEFORE_BUILD: "./tools/build_talib_from_source.bash $DEPS_PATH && pip install numpy"
+      CIBW_BEFORE_ALL_LINUX: >
+        ./tools/build_talib_from_source.bash $DEPS_PATH
+      CIBW_BEFORE_BUILD: "pip install numpy"
       CIBW_BEFORE_TEST: "pip install pytest flake8 pandas"
       CIBW_TEST_COMMAND: "pytest {project}/tests"
       # Can't test cross-compiled Mac OS builds.
       CIBW_TEST_SKIP: "*_arm64 *_universal2:arm64"
+      DEPS_PATH: ${{ github.workspace }}/dependencies
+
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, windows-2019, macos-11]
-        py: ["cp38", "cp39", "cp310"]
+        os: [ubuntu-20.04]
+        # os: [ubuntu-20.04, windows-2019, macos-11]
+        # py: ["cp38", "cp39", "cp310"]
+        py: ["cp310"]
 
     steps:
         - uses: actions/checkout@v2
