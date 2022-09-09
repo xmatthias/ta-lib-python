@@ -7,7 +7,7 @@ instead of SWIG. From the homepage:
 
 > TA-Lib is widely used by trading software developers requiring to perform
 > technical analysis of financial market data.
-
+>
 > * Includes 150+ indicators such as ADX, MACD, RSI, Stochastic, Bollinger
 >   Bands, etc.
 > * Candlestick pattern recognition
@@ -63,6 +63,9 @@ Support is primarily limited by what versions of Python are supported by recent
 versions of numpy. When building locally, make sure you're using a version of
 numpy that supports your Python version.
 
+If the build appears to hang, you might be running on a VM with not enough
+memory -- try 1 GB or 2 GB.
+
 ## Function API
 
 Similar to TA-Lib, the Function API provides a lightweight wrapper of the
@@ -103,6 +106,35 @@ Calculating momentum of the close prices, with a time period of 5:
 
 ```python
 output = talib.MOM(close, timeperiod=5)
+```
+
+##### NaN's
+
+The underlying TA-Lib C library handles NaN's in a sometimes surprising manner
+by typically propagating NaN's to the end of the output, for example:
+
+```python
+>>> c = numpy.array([1.0, 2.0, 3.0, np.nan, 4.0, 5.0, 6.0])
+
+>>> talib.SMA(c, 3)
+array([nan, nan,  2., nan, nan, nan, nan])
+```
+
+You can compare that to a Pandas rolling mean, where their approach is to
+output NaN until enough "lookback" values are observed to generate new outputs:
+
+```python
+>>> c = pandas.Series([1.0, 2.0, 3.0, np.nan, 4.0, 5.0, 6.0])
+
+>>> c.rolling(3).mean()
+0    NaN
+1    NaN
+2    2.0
+3    NaN
+4    NaN
+5    NaN
+6    5.0
+dtype: float64
 ```
 
 ## Abstract API

@@ -11,7 +11,7 @@ from talib import abstract
 # FIXME: don't return number of elements since it always equals allocation?
 
 functions = []
-include_paths = ['/usr/include', '/usr/local/include', '/opt/include', '/opt/local/include']
+include_paths = ['/usr/include', '/usr/local/include', '/opt/include', '/opt/local/include', '/opt/homebrew/include']
 if sys.platform == 'win32':
     include_paths = [r'c:\ta-lib\c\include']
 header_found = False
@@ -26,6 +26,8 @@ if not header_found:
 with open(ta_func_header) as f:
     tmp = []
     for line in f:
+        if line.startswith('TA_LIB_API'):
+            line = line[10:]
         line = line.strip()
         if tmp or \
             line.startswith('TA_RetCode TA_') or \
@@ -136,6 +138,7 @@ for f in functions:
         lower_case = False
         documentation = documentation.split('\n')[2:] # discard abstract calling definition
         for line in documentation:
+            line = line.replace('Substraction', 'Subtraction')
             if 'prices' not in line and 'price' in line:
                 line = line.replace('price', 'real')
             if not line or line.isspace():
