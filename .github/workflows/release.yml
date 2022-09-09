@@ -94,3 +94,34 @@ jobs:
   #     - uses: actions/upload-artifact@v2
   #       with:
   #         path: ./wheelhouse/*.whl
+
+
+  test_wheels:
+    needs: [ build_wheels ]
+    name: Test ${{ matrix.python-version }} ${{ matrix.arch }} wheels for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ 'ubuntu-latest', 'windows-latest', 'macos-latest' ]
+        python-version: ['3.7', '3.8', '3.9','3.10']
+        arch: ['x64', 'x86']
+
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          path: ./wheelhouse/
+
+      - name: Install Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.arch }}
+
+      - name: Install tables on ${{ matrix.python-version }}
+        run: |
+          pip install numpy
+          pip install --no-index --find-links wheelhouse/artifact/ talib
+      - name: Run tests on ${{ matrix.python-version }}
+        run: |
+          python -m talib.abstract
