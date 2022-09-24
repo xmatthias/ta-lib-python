@@ -254,7 +254,7 @@ void TA_S_INT_stddev_using_precalc_ma( const float  *inReal,
  * must be carefully choosen to work in the domain of the tested values.  
  * Do a search on Google for a more generalize algo.
  */
-#define TA_EPSILON (0.00000001)
+#define TA_EPSILON (0.00000000000001)
 #define TA_REAL_EQ(x,v,ep)   (((v-ep)<x)&&(x<(v+ep)))
 #define TA_IS_ZERO(v)        (((-TA_EPSILON)<v)&&(v<TA_EPSILON))
 #define TA_IS_ZERO_OR_NEG(v) (v<TA_EPSILON)
