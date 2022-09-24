@@ -1,0 +1,11 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/ta-lib
+
+Name: ta-lib
+Description: TA-Lib : Technical Analysis Library
+URL: https://github.com/TA-Lib/ta-lib
+Version: git
+Cflags: -I${includedir}
+Libs: -L${libdir} -lta_lib
