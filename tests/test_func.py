@@ -1,12 +1,8 @@
 import numpy as np
-from numpy.testing import (
-    assert_array_equal,
-    assert_array_almost_equal,
-    assert_allclose
-)
 import pytest
-
 import talib
+from numpy.testing import (assert_allclose, assert_array_almost_equal,
+                           assert_array_equal, assert_array_less)
 from talib import func
 
 
@@ -159,9 +155,25 @@ def test_RSI():
       0.00000024, 0.00000024, 0.00000023,
       0.00000023, 0.00000023], dtype='float64')
     result = func.RSI(a, 10)
-    assert_array_equal(result, [np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,0,0,0,0,0,0,0,0,0,0])
+    assert_array_almost_equal(result, [np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,33.333333333333329,51.351351351351347,39.491916859122398,51.84807024709005,42.25953803191981,52.101824405061215,52.101824405061215,43.043664867691085,43.043664867691085,43.043664867691085])
+    # assert_array_equal(result, [np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,0,0,0,0,0,0,0,0,0,0])
     result = func.RSI(a * 100000, 10)
     assert_array_almost_equal(result, [np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,33.333333333333329,51.351351351351347,39.491916859122398,51.84807024709005,42.25953803191981,52.101824405061215,52.101824405061215,43.043664867691085,43.043664867691085,43.043664867691085])
+
+
+
+def test_BBANDS():
+    # Bollinger bands for small numbers fix
+    inputs = np.array([
+        0.00000010,
+        0.00000011,
+        0.00000012,
+        0.00000013,
+        0.00000014
+    ])
+    bollinger = func.BBANDS(inputs, matype=0, timeperiod=2)
+    assert_array_less(bollinger[1], bollinger[0])
+    assert_array_less(bollinger[2], bollinger[1])
 
 
 def test_MAVP():
@@ -181,8 +193,8 @@ def test_MAVP():
 
 
 def test_MAXINDEX():
-    import talib as func
     import numpy as np
+    import talib as func
     a = np.array([1., 2, 3, 4, 5, 6, 7, 8, 7, 7, 3, 4, 5, 6, 7, 8, 9, 2, 3, 4, 5, 15])
     b = func.MA(a, 10)
     c = func.MAXINDEX(b, 10)
