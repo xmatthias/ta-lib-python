@@ -1,6 +1,6 @@
 # TA-Lib
 
-![Tests](https://github.com/mrjbq7/ta-lib/actions/workflows/tests.yml/badge.svg)
+![Tests](https://github.com/ta-lib/ta-lib-python/actions/workflows/tests.yml/badge.svg)
 
 This is a Python wrapper for [TA-LIB](http://ta-lib.org) based on Cython
 instead of SWIG. From the homepage:
@@ -63,8 +63,239 @@ Support is primarily limited by what versions of Python are supported by recent
 versions of numpy. When building locally, make sure you're using a version of
 numpy that supports your Python version.
 
+> Some Conda Forge users have reported success installing the underlying TA-Lib C
+> library using [the libta-lib package](https://anaconda.org/conda-forge/libta-lib):
+>
+> ``$ conda install -c conda-forge libta-lib``
+
+##### Mac OS X
+
+You can simply install using Homebrew:
+
+```
+$ brew install ta-lib
+```
+
+If you are using Apple Silicon, such as the M1 processors, and building mixed
+architecture Homebrew projects, you might want to make sure it's being built
+for your architecture:
+
+```
+$ arch -arm64 brew install ta-lib
+```
+
+And perhaps you can set these before installing with ``pip``:
+
+```
+$ export TA_INCLUDE_PATH="$(brew --prefix ta-lib)/include"
+$ export TA_LIBRARY_PATH="$(brew --prefix ta-lib)/lib"
+```
+
+You might also find this helpful, particularly if you have tried several
+different installations without success:
+
+```
+$ your-arm64-python -m pip install --no-cache-dir ta-lib
+```
+
+##### Windows
+
+Download [ta-lib-0.4.0-msvc.zip](http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-msvc.zip)
+and unzip to ``C:\ta-lib``.
+
+> This is a 32-bit binary release.  If you want to use 64-bit Python, you will
+> need to build a 64-bit version of the library. Some unofficial (**and
+> unsupported**) instructions for building on 64-bit Windows 10, here for
+> reference:
+>
+> 1. Download and Unzip ``ta-lib-0.4.0-msvc.zip``
+> 2. Move the Unzipped Folder ``ta-lib`` to ``C:\``
+> 3. Download and Install Visual Studio Community (2015 or later)
+>    * Remember to Select ``[Visual C++]`` Feature
+> 4. Build TA-Lib Library
+>    * From Windows Start Menu, Start ``[VS2015 x64 Native Tools Command
+>      Prompt]``
+>    * Move to ``C:\ta-lib\c\make\cdr\win32\msvc``
+>    * Build the Library ``nmake``
+
+You might also try these unofficial windows binaries for both 32-bit and
+64-bit:
+
+https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib
+
+##### Linux
+
+Download [ta-lib-0.4.0-src.tar.gz](http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz) and:
+
+```
+$ tar -xzf ta-lib-0.4.0-src.tar.gz
+$ cd ta-lib/
+$ ./configure --prefix=/usr
+$ make
+$ sudo make install
+```
+
+> If you build ``TA-Lib`` using ``make -jX`` it will fail but that's OK!
+> Simply rerun ``make -jX`` followed by ``[sudo] make install``.
+
+Note: if your directory path includes spaces, the installation will probably
+fail with ``No such file or directory`` errors.
+
+### Troubleshooting
+
+If you get a warning that looks like this:
+
+```
+setup.py:79: UserWarning: Cannot find ta-lib library, installation may fail.
+warnings.warn('Cannot find ta-lib library, installation may fail.')
+```
+
+This typically means ``setup.py`` can't find the underlying ``TA-Lib``
+library, a dependency which needs to be installed.
+
+---
+
+If you installed the underlying ``TA-Lib`` library with a custom prefix
+(e.g., with ``./configure --prefix=$PREFIX``), then when you go to install
+this python wrapper you can specify additional search paths to find the
+library and include files for the underlying ``TA-Lib`` library using the
+``TA_LIBRARY_PATH`` and ``TA_INCLUDE_PATH`` environment variables:
+
+```sh
+$ export TA_LIBRARY_PATH=$PREFIX/lib
+$ export TA_INCLUDE_PATH=$PREFIX/include
+$ python setup.py install # or pip install ta-lib
+```
+
+---
+
+Sometimes installation will produce build errors like this:
+
+```
+talib/_ta_lib.c:601:10: fatal error: ta-lib/ta_defs.h: No such file or directory
+  601 | #include "ta-lib/ta_defs.h"
+      |          ^~~~~~~~~~~~~~~~~~
+compilation terminated.
+```
+
+or:
+
+```
+common.obj : error LNK2001: unresolved external symbol TA_SetUnstablePeriod
+common.obj : error LNK2001: unresolved external symbol TA_Shutdown
+common.obj : error LNK2001: unresolved external symbol TA_Initialize
+common.obj : error LNK2001: unresolved external symbol TA_GetUnstablePeriod
+common.obj : error LNK2001: unresolved external symbol TA_GetVersionString
+```
+
+This typically means that it can't find the underlying ``TA-Lib`` library, a
+dependency which needs to be installed.  On Windows, this could be caused by
+installing the 32-bit binary distribution of the underlying ``TA-Lib`` library,
+but trying to use it with 64-bit Python.
+
+---
+
+Sometimes installation will fail with errors like this:
+
+```
+talib/common.c:8:22: fatal error: pyconfig.h: No such file or directory
+ #include "pyconfig.h"
+                      ^
+compilation terminated.
+error: command 'x86_64-linux-gnu-gcc' failed with exit status 1
+```
+
+This typically means that you need the Python headers, and should run
+something like:
+
+```
+$ sudo apt-get install python3-dev
+```
+
+---
+
+Sometimes building the underlying ``TA-Lib`` library has errors running
+``make`` that look like this:
+
+```
+../libtool: line 1717: cd: .libs/libta_lib.lax/libta_abstract.a: No such file or directory
+make[2]: *** [libta_lib.la] Error 1
+make[1]: *** [all-recursive] Error 1
+make: *** [all-recursive] Error 1
+```
+
+This might mean that the directory path to the underlying ``TA-Lib`` library
+has spaces in the directory names.  Try putting it in a path that does not have
+any spaces and trying again.
+
+---
+
+Sometimes you might get this error running ``setup.py``:
+
+```
+/usr/include/limits.h:26:10: fatal error: bits/libc-header-start.h: No such file or directory
+#include <bits/libc-header-start.h>
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
+This is likely an issue with trying to compile for 32-bit platform but
+without the appropriate headers.  You might find some success looking at the
+first answer to [this question](https://stackoverflow.com/questions/54082459/fatal-error-bits-libc-header-start-h-no-such-file-or-directory-while-compili).
+
+---
+
+If you get an error on macOS like this:
+
+```
+code signature in <141BC883-189B-322C-AE90-CBF6B5206F67>
+'python3.9/site-packages/talib/_ta_lib.cpython-39-darwin.so' not valid for
+use in process: Trying to load an unsigned library)
+```
+
+You might look at [this question](https://stackoverflow.com/questions/69610572/how-can-i-solve-the-below-error-while-importing-nltk-package)
+and use ``xcrun codesign`` to fix it.
+
+---
+
+If you wonder why ``STOCHRSI`` gives you different results than you expect,
+probably you want ``STOCH`` applied to ``RSI``, which is a little different
+than the ``STOCHRSI`` which is ``STOCHF`` applied to ``RSI``:
+
+```python
+>>> import talib
+>>> import numpy as np
+>>> c = np.random.randn(100)
+
+# this is the library function
+>>> k, d = talib.STOCHRSI(c)
+
+# this produces the same result, calling STOCHF
+>>> rsi = talib.RSI(c)
+>>> k, d = talib.STOCHF(rsi, rsi, rsi)
+
+# you might want this instead, calling STOCH
+>>> rsi = talib.RSI(c)
+>>> k, d = talib.STOCH(rsi, rsi, rsi)
+```
+
+---
+
 If the build appears to hang, you might be running on a VM with not enough
 memory -- try 1 GB or 2 GB.
+
+---
+
+If you get "permission denied" errors such as this, you might need to give
+your user access to the location where the underlying TA-Lib C library is
+installed -- or install it to a user-accessible location.
+
+```
+talib/_ta_lib.c:747:28: fatal error: /usr/include/ta-lib/ta_defs.h: Permission denied
+ #include "ta-lib/ta-defs.h"
+                            ^
+compilation terminated
+error: command 'gcc' failed with exit status 1
+```
 
 ## Function API
 
@@ -82,10 +313,10 @@ For convenience, the Function API supports both ``numpy.ndarray`` and
 All of the following examples use the Function API:
 
 ```python
-import numpy
+import numpy as np
 import talib
 
-close = numpy.random.random(100)
+close = np.random.random(100)
 ```
 
 Calculate a simple moving average of the close prices:
@@ -114,7 +345,7 @@ The underlying TA-Lib C library handles NaN's in a sometimes surprising manner
 by typically propagating NaN's to the end of the output, for example:
 
 ```python
->>> c = numpy.array([1.0, 2.0, 3.0, np.nan, 4.0, 5.0, 6.0])
+>>> c = np.array([1.0, 2.0, 3.0, np.nan, 4.0, 5.0, 6.0])
 
 >>> talib.SMA(c, 3)
 array([nan, nan,  2., nan, nan, nan, nan])
