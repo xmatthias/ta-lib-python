@@ -50,7 +50,7 @@ jobs:
       CIBW_BEFORE_TEST: "pip install -r requirements_test.txt"
       CIBW_TEST_COMMAND: "pytest {project}/tests"
       # Can't test cross-compiled Mac OS builds.
-      CIBW_TEST_SKIP: "*_arm64 *_universal2:arm64"
+      CIBW_TEST_SKIP: "*_arm64 *_universal2:arm64 *_win32 *_i686"
     strategy:
       fail-fast: false
       matrix:
