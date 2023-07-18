@@ -1,12 +1,9 @@
 import numpy as np
-import pytest
+import polars as pl
 from numpy.testing import assert_array_equal
 
 import talib
 from talib import abstract
-
-
-pl = pytest.importorskip('polars')
 
 
 def test_MOM():

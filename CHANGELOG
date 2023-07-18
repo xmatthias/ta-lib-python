@@ -1,9 +1,20 @@
+0.4.27
+======
+
+- [NEW]: Upgrade to Cython 0.29.36
+
+- [FIX]: Fix abstract info to keep values doubles when they are (e.g., nbdevup, nvdevdn)
+
+- [FIX]: Don't throw exceptions when inputs are all NaN
+
 0.4.26
 ======
 
-- [NEW]: Upgrade to Cython 0.29.33
+- [NEW]: Upgrade to Cython 0.29.34
 
 - [NEW]: Moved to https://github.com/ta-lib/ta-lib-python
+
+- [FIX]: Fix deprecation warning for polars.DataFrame(columns=[...])
 
 0.4.25
 ======

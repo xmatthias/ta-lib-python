@@ -22,9 +22,14 @@ jobs:
     - name: Install dependencies
       run: |
         pip install --upgrade pip wheel
-        pip install numpy flake8 pytest pandas polars
-
-    - name: Installing Python TA-Lib
+        pip install -r requirements_test.txt
+        pip install flake8
+        ./tools/build_talib_from_source.bash $DEPS_PATH
+      env:
+        DEPS_PATH: ${{ github.workspace }}/dependencies
+        TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
+        TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
+    - name: Build cython modules in-place
       run: |
         python setup.py install
 

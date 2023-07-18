@@ -29,7 +29,7 @@ libraries.
 You can install from PyPI:
 
 ```
-$ python3 -m pip install TA-Lib
+$ python -m pip install TA-Lib
 ```
 
 Or checkout the sources and run ``setup.py`` yourself:
@@ -418,7 +418,7 @@ output = SMA(inputs, timeperiod=25)
 output = SMA(inputs, timeperiod=25, price='open')
 
 # uses close prices (default)
-upper, middle, lower = BBANDS(inputs, 20, 2, 2)
+upper, middle, lower = BBANDS(inputs, 20, 2.0, 2.0)
 
 # uses high, low, close (default)
 slowk, slowd = STOCH(inputs, 5, 3, 0, 3, 0) # uses high, low, close by default
