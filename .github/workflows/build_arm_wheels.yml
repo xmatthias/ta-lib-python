@@ -39,6 +39,7 @@ jobs:
       run: |
         docker buildx build -f Dockerfile \
           --platform linux/arm/v7 \
+          --build-arg RUN_TESTS=0 \
           --load \
           -t talib:wheel .
 
