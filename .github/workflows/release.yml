@@ -43,7 +43,7 @@ jobs:
       CIBW_ARCHS_MACOS: auto universal2
       CIBW_ARCHS_WINDOWS: auto
       # musllinux builds, but is unstable, see https://github.com/numpy/numpy/pull/21200
-      CIBW_SKIP: "*-musllinux_*"
+      CIBW_SKIP: "*-musllinux_* *_i686"
       # Ensure numpy is installed first to get around a bug with setuptools
       # which causes conflicts when installing eggs.
       CIBW_BEFORE_BUILD: "pip install numpy"
