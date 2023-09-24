@@ -37,7 +37,7 @@ jobs:
 
     - name: Build TA-Lib wheels
       run: |
-        docker buildx build -f Dockerfile \
+        docker buildx build -f Dockerfile.armhf \
           --platform linux/arm/v7 \
           --build-arg RUN_TESTS=0 \
           --build-arg PYTHON_VERSION=3.9 \
