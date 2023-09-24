@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /src/ta-lib-python
 COPY . .
 RUN python -m pip install numpy==1.25.2 \
-    && python -m pip install -e . \
+    && python -m pip install --no-build-isolation -e . \
     && python -c 'import numpy, talib; close = numpy.random.random(100); output = talib.SMA(close); print(output)' \
     && python -m pip wheel --wheel-dir wheels .
 
