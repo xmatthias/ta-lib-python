@@ -22,7 +22,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install --upgrade pip wheel
+        pip install --upgrade pip setuptools wheel
         pip install -r requirements_test.txt
         pip install flake8
         ./tools/build_talib_from_source.bash $DEPS_PATH
