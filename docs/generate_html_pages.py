@@ -19,7 +19,8 @@ import os
 import sys
 import talib
 
-import mistune.renderers
+import mistune
+
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters.html import HtmlFormatter
@@ -187,8 +188,8 @@ def get_groups_markdown():
                 group_docs.append('Learn more about the %s at [tadoc.org](%s).  ' % (
                     f.info['display_name'], doc_links[func]))
 
-        group_docs.append('\n[Documentation Index](../doc_index.html)')
-        group_docs.append('[FLOAT_RIGHTAll Function Groups](../funcs.html)')
+        group_docs.append('\n[Documentation Index](../doc_index.md)')
+        group_docs.append('[FLOAT_RIGHTAll Function Groups](../funcs.md)')
 
         ret[slugify(group)] = '\n'.join(group_docs) + '\n'
     return ret
@@ -211,11 +212,11 @@ def get_markdown_file_paths():
 
 def _get_markdown_renderer():
     """Returns a function to convert a Markdown string into pygments-highlighted HTML"""
-    class PygmentsHighlighter(mistune.renderers.HTMLRenderer):
-        def block_code(self, code, lang=None):
-            if not lang:
+    class PygmentsHighlighter(mistune.HTMLRenderer):
+        def block_code(self, code, info=None):
+            if not info:
                 return '\n<pre><code>%s</code></pre>\n' % mistune.escape(code)
-            lexer = get_lexer_by_name(lang, stripall=True)
+            lexer = get_lexer_by_name(info, stripall=True)
             formatter = HtmlFormatter(classprefix='highlight ')
             return highlight(code, lexer, formatter)
     return mistune.Markdown(renderer=PygmentsHighlighter())
