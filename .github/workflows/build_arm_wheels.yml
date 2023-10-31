@@ -49,10 +49,10 @@ jobs:
         docker run --rm -v $(pwd)/assets:/assets \
           --platform linux/arm/v7 \
           talib:wheel \
-          cp -r /opt/ta-lib-python/wheels/ /assets/
+          cp -r /opt/ta-lib-python/wheels/TA_* /assets/
 
     - name: Archive artifacts
       uses: actions/upload-artifact@v3
       with:
         name: ta-lib_arm64_wheel
-        path: ./assets/dist/
+        path: ./assets/
