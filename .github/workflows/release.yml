@@ -123,9 +123,9 @@ jobs:
           architecture: ${{ matrix.arch }}
           allow-prereleases: true
 
-      - name: Install tables on ${{ matrix.python-version }}
+      - name: Install TA-Lib on ${{ matrix.python-version }}
         run: |
-          pip install numpy
+          pip install numpy setuptools
           pip install --no-index --find-links wheelhouse/artifact/ TA-Lib
       - name: Run tests on ${{ matrix.python-version }}
         run: |
