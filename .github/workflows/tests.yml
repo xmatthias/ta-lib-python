@@ -33,10 +33,7 @@ jobs:
 
     - name: Build cython modules in-place
       run: |
-        python setup.py build_ext --inplace --include-dirs=$TA_INCLUDE_PATH --library-dirs=$TA_LIBRARY_PATH
-      env:
-        TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
-        TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
+        python setup.py install
 
     - name: Lint with flake8
       run: |
