@@ -31,6 +31,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
+          name: ta-lib_release
           path: dist/*.tar.gz
 
   # Build the wheels which do not require host emulation.
@@ -172,7 +173,7 @@ jobs:
       - name: Install TA-Lib on ${{ matrix.python-version }}
         run: |
           pip install numpy setuptools
-          pip install --no-index --find-links wheelhouse/artifact/ TA-Lib
+          pip install --no-index --find-links wheelhouse/ TA-Lib
       - name: Run tests on ${{ matrix.python-version }}
         run: |
           python -m talib.abstract
