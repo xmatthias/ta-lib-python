@@ -120,7 +120,7 @@ jobs:
 
     - name: Build TA-Lib wheels
       run: |
-        docker buildx build -f Dockerfile.armhf \
+        docker buildx build -f Dockerfile \
           --platform ${{ matrix.platform }} \
           --build-arg RUN_TESTS=0 \
           --build-arg PYTHON_VERSION=${{ matrix.python-version }} \
