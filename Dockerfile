@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /src/ta-lib-python
 COPY . .
 RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
-        echo "[global]\nextra-index-url=https://www.piwheels.org/simple" > /etc/pip.conf \
+        echo "[global]\nextra-index-url=https://www.piwheels.org/simple" > /etc/pip.conf; \
     fi \
     && python -m pip install numpy\
     && python -m pip install -e . \
