@@ -32,7 +32,11 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /src/ta-lib-python
 COPY . .
-RUN python -m pip install -e . \
+RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
+        echo "[global]\nextra-index-url=https://www.piwheels.org/simple" > /etc/pip.conf \
+    fi \
+    && python -m pip install numpy\
+    && python -m pip install -e . \
     && python -c 'import numpy, talib; close = numpy.random.random(100); output = talib.SMA(close); print(output)' \
     && python -m pip wheel --wheel-dir wheels .
 
@@ -48,5 +52,7 @@ RUN if [ "$RUN_TESTS" -ne "0" ]; then \
 FROM python:$PYTHON_VERSION-slim
 COPY --from=builder /src/ta-lib-python/wheels /opt/ta-lib-python/wheels
 COPY --from=builder /opt/ta-lib-core /opt/ta-lib-core
-RUN python -m pip install --no-cache-dir /opt/ta-lib-python/wheels/*.whl \
+RUN apt update \
+    && apt install -y libopenblas-base \
+    && python -m pip install --no-cache-dir /opt/ta-lib-python/wheels/*.whl \
     && python -c 'import numpy, talib; close = numpy.random.random(100); output = talib.SMA(close); print(output)'
