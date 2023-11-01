@@ -159,6 +159,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v3
         with:
+          name: ta-lib_release
           path: ./wheelhouse/
 
       - name: Install Python ${{ matrix.python-version }}
