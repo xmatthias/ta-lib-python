@@ -65,6 +65,7 @@ jobs:
 
         - uses: actions/upload-artifact@v3
           with:
+            name: ta-lib_release
             path: ./wheelhouse/*.whl
 
   # Build the wheels which require host emulation.
@@ -76,7 +77,7 @@ jobs:
   #   strategy:
   #     fail-fast: false
   #     matrix:
-  #       py: ["cp38", "cp39", "cp310"]
+  #       py: ["cp38", "cp39", "cp310", "cp311", "cp312"]
   #       arch: [aarch64, ppc64le]
 
   #   steps:
@@ -94,6 +95,50 @@ jobs:
   #     - uses: actions/upload-artifact@v3
   #       with:
   #         path: ./wheelhouse/*.whl
+
+  build_arm:
+    name: "🏗 Build armHF wheels via Docker"
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.11"]
+        platform: ["linux/arm/v7"]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: crazy-max/ghaction-docker-buildx@v3.3.1
+      with:
+        buildx-version: latest
+        qemu-version: latest
+
+    - name: Available platforms
+      run: echo ${{ steps.buildx.outputs.platforms }}
+
+    - name: Build TA-Lib wheels
+      run: |
+        docker buildx build -f Dockerfile.armhf \
+          --platform ${{ matrix.platform }} \
+          --build-arg RUN_TESTS=0 \
+          --build-arg PYTHON_VERSION=${{ matrix.python-version }} \
+          --load \
+          -t talib:wheel .
+
+    - name: Extract Wheels from image
+      run: |
+        docker run --rm -v $(pwd)/assets:/assets \
+          --platform ${{ matrix.platform }} \
+          talib:wheel \
+          cp -r /opt/ta-lib-python/wheels/ /assets/
+
+    - name: Archive artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ta-lib_release
+        path: ./assets/wheels/TA*
 
 
   test_wheels:
