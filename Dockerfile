@@ -11,6 +11,8 @@ ARG PYTHON_VERSION="3.7"
 
 FROM python:$PYTHON_VERSION as builder
 
+ARG TARGETPLATFORM
+
 ENV TA_PREFIX="/opt/ta-lib-core"
 ENV TA_LIBRARY_PATH="$TA_PREFIX/lib" \
     TA_INCLUDE_PATH="$TA_PREFIX/include"
@@ -32,8 +34,10 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /src/ta-lib-python
 COPY . .
+
 RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
-        echo "[global]\nextra-index-url=https://www.piwheels.org/simple" > /etc/pip.conf; \
+        echo "Building for armv7l" \
+        && echo "[global]\nextra-index-url=https://www.piwheels.org/simple" > /etc/pip.conf; \
     fi \
     && python -m pip install numpy\
     && python -m pip install -e . \
@@ -53,6 +57,6 @@ FROM python:$PYTHON_VERSION-slim
 COPY --from=builder /src/ta-lib-python/wheels /opt/ta-lib-python/wheels
 COPY --from=builder /opt/ta-lib-core /opt/ta-lib-core
 RUN apt update \
-    && apt install -y libopenblas-base \
+    && apt install -y libopenblas-dev \
     && python -m pip install --no-cache-dir /opt/ta-lib-python/wheels/*.whl \
     && python -c 'import numpy, talib; close = numpy.random.random(100); output = talib.SMA(close); print(output)'
