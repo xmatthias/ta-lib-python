@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 import glob
+import os
+import sys
 from os import path
 
 try:
-    from setuptools import setup, Extension
+    from setuptools import Extension, setup
     requires = {
         "install_requires": ["numpy"],
         "setup_requires": ["numpy"]
@@ -12,6 +14,46 @@ except ImportError:
     from distutils.core import setup
     from distutils.extension import Extension
     requires = {"requires": ["numpy"]}
+
+lib_talib_name = 'ta_lib'  # the underlying C library's name
+
+platform_supported = False
+
+if any(s in sys.platform for s in ['darwin', 'linux', 'bsd', 'sunos']):
+    platform_supported = True
+    include_dirs = [
+        '/usr/include',
+        '/usr/local/include',
+        '/opt/include',
+        '/opt/local/include',
+        '/opt/homebrew/include',
+        '/opt/homebrew/opt/ta-lib/include',
+    ]
+    library_dirs = [
+        '/usr/lib',
+        '/usr/local/lib',
+        '/usr/lib64',
+        '/usr/local/lib64',
+        '/opt/lib',
+        '/opt/local/lib',
+        '/opt/homebrew/lib',
+        '/opt/homebrew/opt/ta-lib/lib',
+    ]
+
+elif sys.platform == "win32":
+    platform_supported = True
+    lib_talib_name = 'ta_libc_cdr'
+    include_dirs = [r"c:\ta-lib\c\include"]
+    library_dirs = [r"c:\ta-lib\c\lib"]
+
+if 'TA_INCLUDE_PATH' in os.environ:
+    include_dirs = os.environ['TA_INCLUDE_PATH'].split(os.pathsep)
+
+if 'TA_LIBRARY_PATH' in os.environ:
+    library_dirs = os.environ['TA_LIBRARY_PATH'].split(os.pathsep)
+
+if not platform_supported:
+    raise NotImplementedError(sys.platform)
 
 try:
     from Cython.Distutils import build_ext as cython_build_ext
@@ -103,7 +145,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='TA-Lib',
-    version='0.4.28',
+    version='0.4.29',
     description='Python wrapper for TA-Lib',
     long_description=long_description,
     long_description_content_type='text/markdown',
