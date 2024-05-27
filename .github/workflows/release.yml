@@ -31,7 +31,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ta-lib_release
+          name: ta-lib_release-source
           path: dist/*.tar.gz
 
   # Build the wheels which do not require host emulation.
@@ -66,7 +66,7 @@ jobs:
 
         - uses: actions/upload-artifact@v4
           with:
-            name: ta-lib_release
+            name: ta-lib_release-${{ matrix.os }}-${{ matrix.py }}
             path: ./wheelhouse/*.whl
 
   # Build the wheels which require host emulation.
@@ -138,7 +138,7 @@ jobs:
     - name: Archive artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: ta-lib_release
+        name: ta-lib_release-${{ matrix.platform }}-${{ matrix.python-version }}
         path: ./assets/wheels/TA*
 
 
@@ -177,3 +177,13 @@ jobs:
       - name: Run tests on ${{ matrix.python-version }}
         run: |
           python -m talib.abstract
+
+  combine-wheels:
+    needs: [ sdist, build_wheels, build_arm ]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Merge Artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: ta-lib_release
+          delete-merged: true
