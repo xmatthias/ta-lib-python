@@ -141,9 +141,18 @@ jobs:
         name: ta-lib_release-${{ matrix.platform }}-${{ matrix.python-version }}
         path: ./assets/wheels/TA*
 
+  combine-wheels:
+    needs: [ sdist, build_wheels, build_arm ]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Merge Artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: ta-lib_release
+          delete-merged: true
 
   test_wheels:
-    needs: [ build_wheels ]
+    needs: [ build_wheels, combine-wheels ]
     name: Test ${{ matrix.python-version }} ${{ matrix.arch }} wheels for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -178,12 +187,3 @@ jobs:
         run: |
           python -m talib.abstract
 
-  combine-wheels:
-    needs: [ sdist, build_wheels, build_arm ]
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Merge Artifacts
-        uses: actions/upload-artifact/merge@v4
-        with:
-          name: ta-lib_release
-          delete-merged: true
