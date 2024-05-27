@@ -14,10 +14,10 @@ jobs:
     name: "🏗 Creating source release"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setting up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.8
 
@@ -29,7 +29,7 @@ jobs:
         run: |
           python setup.py sdist
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ta-lib_release
           path: dist/*.tar.gz
@@ -59,12 +59,12 @@ jobs:
         py: ["cp38", "cp39", "cp310", "cp311", "cp312"]
 
     steps:
-        - uses: actions/checkout@v3
+        - uses: actions/checkout@v4
 
         - name: Building binary wheels
           uses: pypa/cibuildwheel@v2.15.0
 
-        - uses: actions/upload-artifact@v3
+        - uses: actions/upload-artifact@v4
           with:
             name: ta-lib_release
             path: ./wheelhouse/*.whl
@@ -107,7 +107,7 @@ jobs:
         platform: ["linux/arm/v7"]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Docker Buildx
       id: buildx
@@ -136,7 +136,7 @@ jobs:
           cp -r /opt/ta-lib-python/wheels/ /assets/
 
     - name: Archive artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ta-lib_release
         path: ./assets/wheels/TA*
@@ -158,13 +158,13 @@ jobs:
         - os: 'macos-latest'
           arch: 'x86'
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: ta-lib_release
           path: ./wheelhouse/
 
       - name: Install Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.arch }}
