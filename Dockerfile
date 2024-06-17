@@ -39,10 +39,11 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
         echo "Building for armv7l" \
         && echo "[global]\nextra-index-url=https://www.piwheels.org/simple" > /etc/pip.conf; \
     fi \
-    && python -m pip install numpy\
+    && python -m pip install "numpy<2.0.0" build \
     && python -m pip install -e . \
     && python -c 'import numpy, talib; close = numpy.random.random(100); output = talib.SMA(close); print(output)' \
-    && python -m pip wheel --wheel-dir wheels .
+    # && python -m pip wheel --wheel-dir wheels .
+    && python -m build --wheel --outdir wheels .
 
 ARG RUN_TESTS="1"
 RUN if [ "$RUN_TESTS" -ne "0" ]; then \
@@ -56,7 +57,12 @@ RUN if [ "$RUN_TESTS" -ne "0" ]; then \
 FROM python:$PYTHON_VERSION-slim
 COPY --from=builder /src/ta-lib-python/wheels /opt/ta-lib-python/wheels
 COPY --from=builder /opt/ta-lib-core /opt/ta-lib-core
-RUN apt update \
+RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
+        echo "Building for armv7l" \
+        && echo "[global]\nextra-index-url=https://www.piwheels.org/simple" > /etc/pip.conf; \
+    fi \
+    && apt update \
     && apt install -y libopenblas-dev \
-    && python -m pip install --no-cache-dir /opt/ta-lib-python/wheels/*.whl \
+    && python -m pip install --no-cache-dir "numpy<2.0" \
+    && python -m pip install --no-cache-dir "numpy<2.0" /opt/ta-lib-python/wheels/*.whl \
     && python -c 'import numpy, talib; close = numpy.random.random(100); output = talib.SMA(close); print(output)'
