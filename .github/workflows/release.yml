@@ -181,7 +181,7 @@ jobs:
 
       - name: Install TA-Lib on ${{ matrix.python-version }}
         run: |
-          pip install numpy setuptools
+          pip install "numpy<2" setuptools
           pip install --no-index --find-links wheelhouse/ TA-Lib
       - name: Run tests on ${{ matrix.python-version }}
         run: |
