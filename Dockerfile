@@ -64,5 +64,5 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
     && ls -la /opt/ta-lib-python/wheels \
     && apt-get update \
     && apt-get install -y libopenblas-dev \
-    && python -m pip install --no-cache-dir "numpy<2.0" /opt/ta-lib-python/wheels/*.whl \
+    && python -m pip install --no-cache-dir /opt/ta-lib-python/wheels/*.whl \
     && python -c 'import numpy, talib; close = numpy.random.random(100); output = talib.SMA(close); print(output)'
