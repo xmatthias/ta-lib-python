@@ -99,12 +99,14 @@ jobs:
 
   build_arm:
     name: "🏗 Build armHF wheels via Docker"
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.9", "3.11"]
         platform: ["linux/arm/v7"]
+        os: [ubuntu-22.04, macos-14]
+
 
     steps:
     - uses: actions/checkout@v4
@@ -138,7 +140,7 @@ jobs:
     - name: Archive artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: ta-lib_release-armv7-${{ matrix.python-version }}
+        name: ta-lib_release-armv7-${{ matrix.python-version }}-${{ matrix.os }}
         path: ./assets/wheels/TA*
 
   combine-wheels:
