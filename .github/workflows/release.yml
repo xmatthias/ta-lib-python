@@ -139,7 +139,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ta-lib_release-armv7-${{ matrix.python-version }}
-        path: ./assets/wheels/TA*
+        path: ./assets/wheels/*.whl
 
   combine-wheels:
     needs: [ sdist, build_wheels, build_arm ]
