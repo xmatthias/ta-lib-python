@@ -7,17 +7,17 @@ from os import path
 try:
     from setuptools import Extension, setup
     requires = {
-        "install_requires": ["numpy"],
-        "setup_requires": ["numpy"]
+        "install_requires": ["numpy<2"],
+        "setup_requires": ["numpy<2"]
     }
 except ImportError:
     from distutils.core import setup
     from distutils.extension import Extension
-    requires = {"requires": ["numpy"]}
-
-lib_talib_name = 'ta_lib'  # the underlying C library's name
+    requires = {"requires": ["numpy<2"]}
 
 platform_supported = False
+
+lib_talib_name = 'ta_lib'               # the name as of TA-Lib 0.4.0
 
 if any(s in sys.platform for s in ['darwin', 'linux', 'bsd', 'sunos']):
     platform_supported = True
@@ -145,7 +145,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='TA-Lib',
-    version='0.4.34',
+    version='0.4.38',
     description='Python wrapper for TA-Lib',
     long_description=long_description,
     long_description_content_type='text/markdown',
