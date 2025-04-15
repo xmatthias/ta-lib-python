@@ -3,8 +3,12 @@ name: TA-Lib-python GitHub Actions to build wheels
 run-name: TA-Lib-python GitHub Actions to build wheels
 on:
   push:
+    branches:
+      - "main"
+      - "ta_wheel*"
     tags:
       - "v*"
+
 
 env:
   TALIB_C_VER: 0.4.0
