@@ -27,15 +27,30 @@ cd ta-lib-${TALIB_C_VER}
 mkdir -p include/ta-lib/
 cp include/*.h include/ta-lib/
 
-# Create build directory
-mkdir -p _build
-cd _build
 
-# Use CMake to configure the build
-cmake -G "$CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DCMAKE_INSTALL_PREFIX=../../ta-lib-install ..
-if [ $? -ne 0 ]; then
-    echo "CMake configuration failed"
-    exit 1
+
+# for version 0.4.0
+if [ $TALIB_C_VER == "0.4.0" ]; then
+    bash autogen.sh
+    # Build TA-Lib using autoconf/configure
+    ./configure --prefix=$(pwd)/../ta-lib-install
+    if [ $? -ne 0 ]; then
+        echo "Configure failed"
+        exit 1
+    fi
+
+else
+    # for version 0.6.2
+
+    # Create build directory
+    mkdir -p _build
+    cd _build
+    # Use CMake to configure the build
+    cmake -G "$CMAKE_GENERATOR" -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DCMAKE_INSTALL_PREFIX=../../ta-lib-install ..
+    if [ $? -ne 0 ]; then
+        echo "CMake configuration failed"
+        exit 1
+    fi
 fi
 
 # Compile TA-Lib

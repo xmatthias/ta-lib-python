@@ -43,7 +43,7 @@ jobs:
       - name: Install GCC and CMake
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc g++ cmake
+          sudo apt-get install -y gcc g++ cmake automake
       - name: Make script executable
         run: chmod +x ./tools/build_wheel_linux.sh
       - name: Build TA-Lib
@@ -103,6 +103,7 @@ jobs:
             gcc
             g++
             cmake
+            automake
           volumes: ${{ github.workspace }}:/project
       - name: Make script executable
         run: chmod +x ./tools/build_wheel_linux.sh
@@ -237,6 +238,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: install automake
+        run: brew install automake libtool
+        shell: bash
+
       - name: Make script executable
         run: chmod +x ./tools/build_wheel_macos.sh
 
@@ -286,6 +291,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: install automake
+        run: brew install automake libtool
+        shell: bash
 
       - name: Make script executable
         run: chmod +x ./tools/build_wheel_macos.sh
