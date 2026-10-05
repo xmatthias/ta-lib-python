@@ -277,7 +277,14 @@ jobs:
           CIBW_ARCHS_LINUX: armv7l
           CIBW_BUILD: cp311-manylinux* cp313-manylinux*
           # CIBW_BUILD: cp311-manylinux*
-          CIBW_BUILD_FRONTEND: build
+          # numpy has no armv7l wheels, so it's built from source - and numpy>=2.5
+          # requires GCC >= 10.3, while the manylinux_2_31 armv7l image ships GCC 9.4.
+          # Building against numpy 2.4 stays ABI compatible with newer numpy at runtime.
+          CIBW_BEFORE_BUILD: >
+            pip install -U setuptools Cython wheel meson-python ninja &&
+            pip install -U "numpy<2.5"
+          # Reuse the numpy installed above instead of building it again in an isolated env
+          CIBW_BUILD_FRONTEND: "build; args: --no-isolation"
           CIBW_ENVIRONMENT_PASS_LINUX: TALIB_C_VER
           CIBW_ENVIRONMENT_LINUX : >
             TA_LIBRARY_PATH="ta-lib-install/lib"
