@@ -215,42 +215,35 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
           platforms: all
       - name: Build wheels
-        uses: pypa/cibuildwheel@v4.1.1
+        uses: pypa/cibuildwheel@v4.2.1
         env:
-          CIBW_BEFORE_ALL: |
-              bash ./tools/build_talib_linux.sh
-          # CIBW_MANYLINUX_ARMV7L_IMAGE:
+          CIBW_ENVIRONMENT_PASS_LINUX: CFLAGS
+          CFLAGS: -D_GNU_SOURCE
           CIBW_TEST_SKIP: "cp*"
           CIBW_TEST_COMMAND: >
             cd .. &&
             pytest -k "not RSI and not threading" {project}/tests
           CIBW_ARCHS_LINUX: armv7l
           CIBW_BUILD: cp311-manylinux* cp313-manylinux*
-          # CIBW_BUILD: cp311-manylinux*
           # numpy has no armv7l wheels, so it's built from source - and numpy>=2.5
           # requires GCC >= 10.3, while the manylinux_2_31 armv7l image ships GCC 9.4.
           # Building against numpy 2.4 stays ABI compatible with newer numpy at runtime.
+          # cmake is needed by setup.py to build TA-Lib C.
           CIBW_BEFORE_BUILD: >
-            pip install -U setuptools Cython wheel meson-python ninja &&
+            pip install -U setuptools Cython wheel meson-python ninja cmake &&
             pip install -U "numpy<2.5"
           # Reuse the numpy installed above instead of building it again in an isolated env
           CIBW_BUILD_FRONTEND: "build; args: --no-isolation"
-          CIBW_ENVIRONMENT_PASS_LINUX: TALIB_C_VER
           CIBW_ENVIRONMENT_LINUX : >
-            TA_LIBRARY_PATH="ta-lib-install/lib"
-            TA_INCLUDE_PATH="ta-lib-install/include"
             PIP_NO_BUILD_ISOLATION=false
-          CIBW_REPAIR_WHEEL_COMMAND_LINUX: |
-            export LD_LIBRARY_PATH="/project/ta-lib-install/lib:$LD_LIBRARY_PATH"
-            auditwheel repair -w {dest_dir} {wheel}
       - name: Upload wheels
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           path: ./wheelhouse/*.whl
           name: "ta_lib-${{ github.ref_name }}-linux_armv7"
